@@ -1,0 +1,7 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"  # For Node.js projects like React
+    directory: "/"             # Root of your project
+    schedule:
+      interval: "weekly"       # Choose your preferred frequency
+    open-pull-requests-limit: 5  # Limit the number of active PRs
