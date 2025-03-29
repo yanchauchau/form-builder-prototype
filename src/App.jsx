@@ -1,39 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import { Button } from "@chakra-ui/react";
-import './App.css'
+import { useState } from "react";
+// import { useForm, Controller } from 'react-hook-form';
+// import * as Yup from 'yup';
+// import { yupResolver } from '@hookform/resolvers/yup';  // Ensure correct import
+import "./App.css";
+
+import {
+  Badge,
+  Box,
+  HStack,
+  Icon,
+  Image,
+  Text,
+  Button,
+} from "@chakra-ui/react";
+import { HiStar } from "react-icons/hi";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const data = {
+    imageUrl: "https://bit.ly/2Z4KKcF",
+    imageAlt: "Rear view of modern home with pool",
+    beds: 3,
+    title: "Modern home in city center in the heart of historic Los Angeles",
+    formattedPrice: "$435",
+    reviewCount: 34,
+    rating: 4.5,
+  };
+  
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
+    <Box><HStack><h1>test</h1></HStack></Box>
+      <Box w="100vw" borderWidth="1px" display="flex" direction="column">
+   
+        {/* <Image src={data.imageUrl} alt={data.imageAlt} />{" "} */}
+        <Box p="4" spaceY="2" background="gray.800">
+          <HStack>
+            <Badge colorPalette="teal" variant="solid">
+              Superhost
+            </Badge>
+            <HStack gap="1" fontWeight="medium">
+              <Icon color="orange.400">
+                <HiStar />
+              </Icon>
+              <Text>
+                {data.rating} ({data.reviewCount})
+              </Text>
+            </HStack>
+          </HStack>
+          <Text fontWeight="medium" color="fg" textAlign="start">
+            {data.title}
+          </Text>
+          <HStack color="fg.muted">
+            {data.formattedPrice} • {data.beds} beds
+          </HStack>
+        </Box>
+      </Box>
+
+      <Box
+        bg="blue.900"
+        p={5}
+        minHeight="30vh"
+        display="flex"
+        justifyContent="center"
+        alignItems="start"
+      >
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-
-
-
+      </Box>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
