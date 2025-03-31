@@ -32,7 +32,7 @@ function App() {
 
   return (
     <>
-      <Box id="header" p="l">
+      <Box id="header" p="l" borderWidth="1px">
         <HStack>
           <Heading
             as="h1"
@@ -46,14 +46,14 @@ function App() {
       </Box>
 
       <Box w="100%" display="flex" direction="column">
-        <Box w="100%" p="m" spaceY="2" borderWidth="1px">
+        <Box w="100%" p="m" spaceY="2" >
           <h3>Section heading</h3>
 
           <Button>Button</Button>
           <BuildForm setPreview={setPreview} />
         </Box>
 
-        <Box w="100%" p="m" spaceY="2" background="blue.800" id="preview">
+        <Box w="100%" p="m" spaceY="2" background="blue.50" id="preview" >
           <VStack w="100%">
             <Stack p={4} borderWidth="2px" mt={4}>
               <strong>Preview:</strong>

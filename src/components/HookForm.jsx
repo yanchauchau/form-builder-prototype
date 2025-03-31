@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { LabelCustom as Label } from "@/theme/theme";
 import { RiExpandUpDownLine } from "react-icons/ri";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 const TYPE_LABELS = {
@@ -25,46 +25,49 @@ const TYPE_LABELS = {
 
 const BuildForm = ({ setPreview }) => {
   const { register, setValue, watch, formState: { errors } } = useForm();
-
-  const selectedType = watch("selection", "new-question-text");
+  const selectedType = watch("selection", "new-question-text"); 
   const questionText = watch("questionText", "");
   const textResponse = watch("textResponse", "");
   const choiceOptions = watch("choiceOptions", "");
   const selectedChoice = watch("selectedChoice", "");
   const multiSelectOptions = watch("multiSelectOptions", "");
   const selectedMulti = watch("selectedMulti", []);
-
-  const handleMenuSelect = (value) => {
+  const handleMenuSelect = (value) => { 
     setValue("selection", value);
   };
 
-  // **UseEffect to trigger preview update when form data changes**
+  // Effect for Question section
   useEffect(() => {
-    let newPreview = null;
-
-    if (selectedType === "new-question-text" && questionText) {
-      newPreview = (
+    if (questionText) {
+      setPreview(
         <Stack p={4} border="1px solid #ccc">
           <Text fontWeight="bold">Question:</Text>
           <Text>{questionText}</Text>
         </Stack>
       );
-    } else if (selectedType === "new-text" && textResponse) {
-      newPreview = (
+    }
+  }, [questionText, setPreview]);
+
+  // Effect for Text Response section
+  useEffect(() => {
+    if (textResponse) {
+      setPreview(
         <Stack p={4} border="1px solid #ccc">
           <Text fontWeight="bold">Text Response:</Text>
           <Text>{textResponse}</Text>
         </Stack>
       );
-    } else if (selectedType === "new-choice" && choiceOptions) {
+    }
+  }, [textResponse, setPreview]);
+
+  // Effect for Choice section
+  useEffect(() => {
+    if (choiceOptions) {
       const optionsArray = choiceOptions.split(",").map((opt) => opt.trim());
-      newPreview = (
+      setPreview(
         <Stack p={4} border="1px solid #ccc">
           <Text fontWeight="bold">Choice Options:</Text>
-          <RadioGroup.Root
-            value={selectedChoice}
-            onValueChange={(val) => setValue("selectedChoice", val)}
-          >
+          <RadioGroup.Root value={selectedChoice}>
             {optionsArray.map((opt, index) => (
               <RadioGroup.Item key={index} value={opt}>
                 {opt}
@@ -74,15 +77,17 @@ const BuildForm = ({ setPreview }) => {
           {selectedChoice && <Text fontWeight="bold">Selected: {selectedChoice}</Text>}
         </Stack>
       );
-    } else if (selectedType === "new-multiselect" && multiSelectOptions) {
+    }
+  }, [choiceOptions, selectedChoice, setPreview]);
+
+  // Effect for Multi-Select section
+  useEffect(() => {
+    if (multiSelectOptions) {
       const optionsArray = multiSelectOptions.split(",").map((opt) => opt.trim());
-      newPreview = (
+      setPreview(
         <Stack p={4} border="1px solid #ccc">
           <Text fontWeight="bold">Multi-Select Options:</Text>
-          <CheckboxGroup
-            value={selectedMulti}
-            onChange={(vals) => setValue("selectedMulti", vals)}
-          >
+          <CheckboxGroup value={selectedMulti}>
             {optionsArray.map((opt, index) => (
               <Checkbox key={index} value={opt}>
                 {opt}
@@ -93,23 +98,7 @@ const BuildForm = ({ setPreview }) => {
         </Stack>
       );
     }
-
-    // Update preview only if there's new content to show
-    if (newPreview) {
-      setPreview(newPreview);
-    }
-
-  }, [
-    selectedType,
-    questionText,
-    textResponse,
-    choiceOptions,
-    selectedChoice,
-    multiSelectOptions,
-    selectedMulti,
-    setPreview,
-    setValue,
-  ]);
+  }, [multiSelectOptions, selectedMulti, setPreview]);
 
   return (
     <Stack gap="4">
