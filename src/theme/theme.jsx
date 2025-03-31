@@ -5,6 +5,11 @@ export const ButtonCustom = chakra("button", {
   base: {
     padding: "8px 16px",
     borderRadius: "4px",
+    display:"inline-flex",
+    alignItems: "center",
+    gap: "xxs",
+    cursor:"pointer",
+    fontWeight:"500",
     _hover: { bg: "blue.700" },
   },
   variants: {
@@ -20,8 +25,8 @@ export const ButtonCustom = chakra("button", {
       },
     },
     size: {
-      sm: { px: "s", py: "xxs", fontSize: "12px" },
-      md: { px: "m", py: "xxs", fontSize: "16px" },
+      sm: { px: "xs", py: "xxs", fontSize: "12px" },
+      md: { px: "s", py: "xxs", fontSize: "16px" },
       lg: { px: "l", py: "xs", fontSize: "16px" },
     },
   },

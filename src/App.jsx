@@ -6,9 +6,11 @@ import BuildForm from "./components/HookForm";
 import {
   Badge,
   Box,
+  Heading,
   HStack,
   Icon,
   Image,
+  Stack,
   Text,
   Button,
   VStack,
@@ -17,7 +19,7 @@ import { HiStar } from "react-icons/hi";
 
 function App() {
   const [count, setCount] = useState(0);
-
+  const [preview, setPreview] = useState(null);
   const data = {
     imageUrl: "https://bit.ly/2Z4KKcF",
     imageAlt: "Rear view of modern home with pool",
@@ -30,29 +32,33 @@ function App() {
 
   return (
     <>
-      <Box id="header" p="l" bg="colorTest">
-        <HStack  bg="colorTest">
-          <h1>test</h1>
+      <Box id="header" p="l">
+        <HStack>
+          <Heading
+            as="h1"
+            size="lg"
+            bg="linear-gradient(to left,rgb(123, 228, 31),rgb(2, 65, 137))"
+            bgClip="text"
+          >
+         Form builder
+          </Heading>
         </HStack>
       </Box>
 
       <Box w="100%" display="flex" direction="column">
-        <Box w="100%" p="m" spaceY="2" bg="gray.50" borderWidth="1px">
-         <h3>Test</h3>
+        <Box w="100%" p="m" spaceY="2" borderWidth="1px">
+          <h3>Section heading</h3>
 
-         <Button>Test</Button>
-          <BuildForm />
-        </Box>  
+          <Button>Button</Button>
+          <BuildForm setPreview={setPreview} />
+        </Box>
 
         <Box w="100%" p="m" spaceY="2" background="blue.800" id="preview">
           <VStack w="100%">
-      
-            <h2>preview</h2>
-            <Box className="question">
-              <p>test</p>
-            </Box>
-            
-            
+            <Stack p={4} borderWidth="2px" mt={4}>
+              <strong>Preview:</strong>
+              {preview}
+            </Stack>
           </VStack>
         </Box>
       </Box>
