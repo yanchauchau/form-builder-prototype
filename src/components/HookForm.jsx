@@ -1,8 +1,10 @@
 import {
+
   Button,
   Input,
   Stack,
   Menu,
+Heading, 
   Fieldset,
   Field,
   Portal,
@@ -13,7 +15,7 @@ import {
   CheckboxGroup,
   RadioGroup,
 } from "@chakra-ui/react";
-import { LabelCustom as Label } from "@/theme/theme";
+// import { LabelCustom as Label } from "@/theme/theme";
 import { RiExpandUpDownLine } from "react-icons/ri";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -47,9 +49,9 @@ const BuildForm = ({ setPreview }) => {
   useEffect(() => {
     if (questionText) {
       setPreview(
-        <Stack p={4} border="1px solid #ccc">
-          <Text fontWeight="bold">Question:</Text>
-          <Text>{questionText}</Text>
+        <Stack p={4} border="1px solid #ccc" bg="white" borderRadius="md">
+  
+           <Heading size="lg" fontWeight="normal">{questionText}</Heading>
         </Stack>
       );
     }
@@ -59,7 +61,7 @@ const BuildForm = ({ setPreview }) => {
   useEffect(() => {
     if (textResponse) {
       setPreview(
-        <Stack p={4} border="1px solid #ccc">
+   <Stack p={4} border="1px solid #ccc" bg="white" borderRadius="md">
           <Text fontWeight="bold">Text Response:</Text>
           <Text>{textResponse}</Text>
         </Stack>
@@ -67,48 +69,55 @@ const BuildForm = ({ setPreview }) => {
     }
   }, [textResponse, setPreview]);
 
+  // Effect for Choices section
 
-    // Effect for Choices section
+  useEffect(() => {
+    if (choiceOptions) {
+      const optionsArray = choiceOptions.split(",").map((opt) => opt.trim());
 
-    useEffect(() => {
-      if (choiceOptions) {
-        const optionsArray = choiceOptions.split(",").map((opt) => opt.trim());
-    
-        setPreview(
-          <Stack p={4} border="1px solid #ccc">
-            <Text fontWeight="bold">Choice Options:</Text>
-    
-            <RadioGroup.Root
-              value={selectedChoice}
-              onValueChange={(val) => {
-                if (typeof val === 'object' && val !== null && val.hasOwnProperty('value')) {
-                  setValue("selectedChoice", val.value);
-                } else {
-                  console.error("RadioGroup value is not the expected object:", val);
-                }
-              }}
-              aria-label="Choice Selection"
-            >
-              <Stack dir="row" g="s">
-                {optionsArray.map((opt, index) => (
-                  <RadioGroup.Item key={`${opt}-${index}`} value={`${opt}-${index}`}>
-                    <RadioGroup.ItemHiddenInput />
-                    <RadioGroup.ItemIndicator />
-                    <RadioGroup.ItemText>{opt}</RadioGroup.ItemText>
-                  </RadioGroup.Item>
-                ))}
-              </Stack>
-            </RadioGroup.Root>
-    
-            {selectedChoice && (
-              <Text fontWeight="bold">Selected: {selectedChoice}</Text>
-            )}
-          </Stack>
-        );
-      }
-    }, [choiceOptions, selectedChoice, setPreview, setValue]);
+      setPreview(
+   <Stack p={4} border="1px solid #ccc" bg="white" borderRadius="md" >
+          <Text fontWeight="bold">Choice Options:</Text>
 
+          <RadioGroup.Root
+            value={selectedChoice}
+            onValueChange={(val) => {
+              if (
+                typeof val === "object" &&
+                val !== null &&
+                val.hasOwnProperty("value")
+              ) {
+                setValue("selectedChoice", val.value);
+              } else {
+                console.error(
+                  "RadioGroup value is not the expected object:",
+                  val
+                );
+              }
+            }}
+            aria-label="Choice Selection"
+          >
+            <Stack dir="row" g="s">
+              {optionsArray.map((opt, index) => (
+                <RadioGroup.Item
+                  key={`${opt}-${index}`}
+                  value={`${opt}-${index}`}
+                >
+                  <RadioGroup.ItemHiddenInput />
+                  <RadioGroup.ItemIndicator />
+                  <RadioGroup.ItemText>{opt}</RadioGroup.ItemText>
+                </RadioGroup.Item>
+              ))}
+            </Stack>
+          </RadioGroup.Root>
 
+          {selectedChoice && (
+            <Text fontWeight="bold">Selected: {selectedChoice}</Text>
+          )}
+        </Stack>
+      );
+    }
+  }, [choiceOptions, selectedChoice, setPreview, setValue]);
 
   // Effect for Multi-Select section
   useEffect(() => {
@@ -117,7 +126,7 @@ const BuildForm = ({ setPreview }) => {
         .split(",")
         .map((opt) => opt.trim());
       setPreview(
-        <Stack p={4} border="1px solid #ccc">
+   <Stack p={4} border="1px solid #ccc" bg="white" borderRadius="md">
           <Text fontWeight="bold">Multi-Select Options:</Text>
           <CheckboxGroup value={selectedMulti}>
             {optionsArray.map((opt, index) => (
@@ -137,38 +146,42 @@ const BuildForm = ({ setPreview }) => {
   return (
     <Stack gap="4">
       <Grid
-        templateRows="repeat(2, 1fr)"
+        templateRows="repeat(2, auto)"
         templateColumns="repeat(5, 1fr)"
-        gap={4}
-        borderWidth="2px"
+        rowGap="s"
+        columnGap={0}
+        gridAutoRows="auto"
+        borderWidth="1px"
+        borderRadius="md"
       >
         <GridItem
           rowSpan={2}
           colSpan={1}
-          borderWidth="2px"
           alignContent="center"
+          roundedLeft="md"
+
           p="xs"
+          bg="gray.50"
         >
-          <Stack className="field">
-            <Label>Order</Label>
+          <Field.Root>
+            <Field.Label>Order</Field.Label>
             <Input {...register("order", { required: "Order is required" })} />
             {errors.order && (
               <p style={{ color: "red" }}>{errors.order.message}</p>
             )}
-          </Stack>
+          </Field.Root>
         </GridItem>
 
-        <GridItem colSpan={4} p="xs" borderWidth="2px" display="flex" gap="s">
-          <Stack className="field">
-            <Label>Last Name</Label>
+        <GridItem colSpan={4} p="xs" display="flex" gap="s">
+          {/* <Field.Root>
+            <Field.Label>Last Name</Field.Label>
             <Input
               {...register("lastName", { required: "Last name is required" })}
             />
             {errors.lastName && (
               <p style={{ color: "red" }}>{errors.lastName.message}</p>
             )}
-          </Stack>
-
+          </Field.Root> */}
           <Menu.Root>
             <Menu.Trigger asChild>
               <Button colorPalette="blue" size="md" variant="outline">
@@ -193,10 +206,10 @@ const BuildForm = ({ setPreview }) => {
           </Menu.Root>
         </GridItem>
 
-        <GridItem colSpan={4} borderWidth="2px" p="4">
+        <GridItem colSpan={4} p="xs" gap="s">
           {selectedType === "new-question-text" && (
-            <Stack className="field">
-              <Label>Question text</Label>
+            <Field.Root>
+              <Field.Label>Question text</Field.Label>
               <Input
                 {...register("questionText", {
                   required: "Question text is required",
@@ -205,12 +218,12 @@ const BuildForm = ({ setPreview }) => {
               {errors.questionText && (
                 <p style={{ color: "red" }}>{errors.questionText.message}</p>
               )}
-            </Stack>
+            </Field.Root>
           )}
 
           {selectedType === "new-text" && (
-            <Stack className="field">
-              <Label>Text Response</Label>
+            <Field.Root>
+              <Field.Label>Text Response</Field.Label>
               <Input
                 {...register("textResponse", {
                   required: "Response is required",
@@ -219,26 +232,42 @@ const BuildForm = ({ setPreview }) => {
               {errors.textResponse && (
                 <p style={{ color: "red" }}>{errors.textResponse.message}</p>
               )}
-            </Stack>
+            </Field.Root>
           )}
 
           {selectedType === "new-choice" && (
-            <Stack className="field">
-              <Label>Choice Options (comma separated)</Label>
-              <Input
-                {...register("choiceOptions", {
-                  required: "Choices are required",
-                })}
-              />
-              {errors.choiceOptions && (
-                <p style={{ color: "red" }}>{errors.choiceOptions.message}</p>
-              )}
-            </Stack>
+            <Fieldset.Root>
+              <Field.Root>
+                <Field.Label>Question text</Field.Label>
+                <Input
+                  {...register("questionTextforChoice", {
+                    required: "Question text is required",
+                  })}
+                />
+                {errors.questionTextforChoice && (
+                  <p style={{ color: "red" }}>
+                    {errors.questionTextforChoice.message}
+                  </p>
+                )}
+              </Field.Root>
+              <Field.Root>
+                <Field.Label>Choice Options (comma separated)</Field.Label>
+                <Input
+                  {...register("choiceOptions", {
+                    required: "Choices are required",
+                  })}
+                />
+                {errors.choiceOptions && (
+                  <p style={{ color: "red" }}>{errors.choiceOptions.message}</p>
+                )}
+              </Field.Root>
+              
+            </Fieldset.Root>
           )}
 
           {selectedType === "new-multiselect" && (
-            <Stack className="field">
-              <Label>Multi-Select Options (comma separated)</Label>
+            <Field.Root>
+              <Field.Label>Multi-Select Options (comma separated)</Field.Label>
               <Input
                 {...register("multiSelectOptions", {
                   required: "Options are required",
@@ -249,7 +278,7 @@ const BuildForm = ({ setPreview }) => {
                   {errors.multiSelectOptions.message}
                 </p>
               )}
-            </Stack>
+            </Field.Root>
           )}
         </GridItem>
       </Grid>

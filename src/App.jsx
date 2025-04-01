@@ -10,7 +10,8 @@ import {
   HStack,
   Icon,
   Image,
-  Menu, Portal,
+  Menu,
+  Portal,
   Fieldset,
   Stack,
   Text,
@@ -49,28 +50,13 @@ function App() {
       </Box>
 
       <Box w="100%" display="flex" direction="column">
-        <Box w="100%" p="m" spaceY="2">
+        <Box w="100%" p="m" spaceY="2" >
           <h3>Section heading</h3>
-          <RadioGroup.Root>
-            <RadioGroup.Item key="2" value="2">
-      
-              <RadioGroup.ItemHiddenInput />
-              <RadioGroup.ItemIndicator />
-              <RadioGroup.ItemText>Test</RadioGroup.ItemText>
-            </RadioGroup.Item>
-      
-          </RadioGroup.Root>
-          <Button>Button</Button>
           <BuildForm setPreview={setPreview} />
         </Box>
-
         <Box w="100%" p="m" spaceY="2" background="blue.50" id="preview">
-          <VStack w="100%">
-            <Stack p={4} borderWidth="2px" mt={4}>
-              <strong>Preview:</strong>
-              {preview}
-            </Stack>
-          </VStack>
+          <h2>Preview</h2>
+          <Box> {preview}</Box>
         </Box>
       </Box>
 
