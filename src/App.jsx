@@ -10,8 +10,11 @@ import {
   HStack,
   Icon,
   Image,
+  Menu, Portal,
+  Fieldset,
   Stack,
   Text,
+  RadioGroup,
   Button,
   VStack,
 } from "@chakra-ui/react";
@@ -40,20 +43,28 @@ function App() {
             bg="linear-gradient(to left,rgb(123, 228, 31),rgb(2, 65, 137))"
             bgClip="text"
           >
-         Form builder
+            Form builder
           </Heading>
         </HStack>
       </Box>
 
       <Box w="100%" display="flex" direction="column">
-        <Box w="100%" p="m" spaceY="2" >
+        <Box w="100%" p="m" spaceY="2">
           <h3>Section heading</h3>
-
+          <RadioGroup.Root>
+            <RadioGroup.Item key="2" value="2">
+      
+              <RadioGroup.ItemHiddenInput />
+              <RadioGroup.ItemIndicator />
+              <RadioGroup.ItemText>Test</RadioGroup.ItemText>
+            </RadioGroup.Item>
+      
+          </RadioGroup.Root>
           <Button>Button</Button>
           <BuildForm setPreview={setPreview} />
         </Box>
 
-        <Box w="100%" p="m" spaceY="2" background="blue.50" id="preview" >
+        <Box w="100%" p="m" spaceY="2" background="blue.50" id="preview">
           <VStack w="100%">
             <Stack p={4} borderWidth="2px" mt={4}>
               <strong>Preview:</strong>
@@ -63,7 +74,7 @@ function App() {
         </Box>
       </Box>
 
-      <Box id="tester" bg="blue.900" display="flex" m="xl">
+      {/* <Box id="tester" bg="blue.900" display="flex" m="xl">
         <Box w="100%" p="4" spaceY="2" background="gray.800">
           <HStack>
             <Badge colorPalette="teal" variant="solid">
@@ -88,7 +99,7 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-      </Box>
+      </Box> */}
     </>
   );
 }

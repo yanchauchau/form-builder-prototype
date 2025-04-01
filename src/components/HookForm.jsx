@@ -3,6 +3,8 @@ import {
   Input,
   Stack,
   Menu,
+  Fieldset,
+  Field,
   Portal,
   Grid,
   GridItem,
@@ -24,15 +26,20 @@ const TYPE_LABELS = {
 };
 
 const BuildForm = ({ setPreview }) => {
-  const { register, setValue, watch, formState: { errors } } = useForm();
-  const selectedType = watch("selection", "new-question-text"); 
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const selectedType = watch("selection", "new-question-text");
   const questionText = watch("questionText", "");
   const textResponse = watch("textResponse", "");
   const choiceOptions = watch("choiceOptions", "");
   const selectedChoice = watch("selectedChoice", "");
   const multiSelectOptions = watch("multiSelectOptions", "");
   const selectedMulti = watch("selectedMulti", []);
-  const handleMenuSelect = (value) => { 
+  const handleMenuSelect = (value) => {
     setValue("selection", value);
   };
 
@@ -60,30 +67,55 @@ const BuildForm = ({ setPreview }) => {
     }
   }, [textResponse, setPreview]);
 
-  // Effect for Choice section
-  useEffect(() => {
-    if (choiceOptions) {
-      const optionsArray = choiceOptions.split(",").map((opt) => opt.trim());
-      setPreview(
-        <Stack p={4} border="1px solid #ccc">
-          <Text fontWeight="bold">Choice Options:</Text>
-          <RadioGroup.Root value={selectedChoice}>
-            {optionsArray.map((opt, index) => (
-              <RadioGroup.Item key={index} value={opt}>
-                {opt}
-              </RadioGroup.Item>
-            ))}
-          </RadioGroup.Root>
-          {selectedChoice && <Text fontWeight="bold">Selected: {selectedChoice}</Text>}
-        </Stack>
-      );
-    }
-  }, [choiceOptions, selectedChoice, setPreview]);
+
+    // Effect for Choices section
+
+    useEffect(() => {
+      if (choiceOptions) {
+        const optionsArray = choiceOptions.split(",").map((opt) => opt.trim());
+    
+        setPreview(
+          <Stack p={4} border="1px solid #ccc">
+            <Text fontWeight="bold">Choice Options:</Text>
+    
+            <RadioGroup.Root
+              value={selectedChoice}
+              onValueChange={(val) => {
+                if (typeof val === 'object' && val !== null && val.hasOwnProperty('value')) {
+                  setValue("selectedChoice", val.value);
+                } else {
+                  console.error("RadioGroup value is not the expected object:", val);
+                }
+              }}
+              aria-label="Choice Selection"
+            >
+              <Stack dir="row" g="s">
+                {optionsArray.map((opt, index) => (
+                  <RadioGroup.Item key={`${opt}-${index}`} value={`${opt}-${index}`}>
+                    <RadioGroup.ItemHiddenInput />
+                    <RadioGroup.ItemIndicator />
+                    <RadioGroup.ItemText>{opt}</RadioGroup.ItemText>
+                  </RadioGroup.Item>
+                ))}
+              </Stack>
+            </RadioGroup.Root>
+    
+            {selectedChoice && (
+              <Text fontWeight="bold">Selected: {selectedChoice}</Text>
+            )}
+          </Stack>
+        );
+      }
+    }, [choiceOptions, selectedChoice, setPreview, setValue]);
+
+
 
   // Effect for Multi-Select section
   useEffect(() => {
     if (multiSelectOptions) {
-      const optionsArray = multiSelectOptions.split(",").map((opt) => opt.trim());
+      const optionsArray = multiSelectOptions
+        .split(",")
+        .map((opt) => opt.trim());
       setPreview(
         <Stack p={4} border="1px solid #ccc">
           <Text fontWeight="bold">Multi-Select Options:</Text>
@@ -94,7 +126,9 @@ const BuildForm = ({ setPreview }) => {
               </Checkbox>
             ))}
           </CheckboxGroup>
-          {selectedMulti.length > 0 && <Text fontWeight="bold">Selected: {selectedMulti.join(", ")}</Text>}
+          {selectedMulti.length > 0 && (
+            <Text fontWeight="bold">Selected: {selectedMulti.join(", ")}</Text>
+          )}
         </Stack>
       );
     }
@@ -102,20 +136,37 @@ const BuildForm = ({ setPreview }) => {
 
   return (
     <Stack gap="4">
-      <Grid templateRows="repeat(2, 1fr)" templateColumns="repeat(5, 1fr)" gap={4} borderWidth="2px">
-        <GridItem rowSpan={2} colSpan={1} borderWidth="2px" alignContent="center" p="xs">
+      <Grid
+        templateRows="repeat(2, 1fr)"
+        templateColumns="repeat(5, 1fr)"
+        gap={4}
+        borderWidth="2px"
+      >
+        <GridItem
+          rowSpan={2}
+          colSpan={1}
+          borderWidth="2px"
+          alignContent="center"
+          p="xs"
+        >
           <Stack className="field">
             <Label>Order</Label>
             <Input {...register("order", { required: "Order is required" })} />
-            {errors.order && <p style={{ color: "red" }}>{errors.order.message}</p>}
+            {errors.order && (
+              <p style={{ color: "red" }}>{errors.order.message}</p>
+            )}
           </Stack>
         </GridItem>
 
         <GridItem colSpan={4} p="xs" borderWidth="2px" display="flex" gap="s">
           <Stack className="field">
             <Label>Last Name</Label>
-            <Input {...register("lastName", { required: "Last name is required" })} />
-            {errors.lastName && <p style={{ color: "red" }}>{errors.lastName.message}</p>}
+            <Input
+              {...register("lastName", { required: "Last name is required" })}
+            />
+            {errors.lastName && (
+              <p style={{ color: "red" }}>{errors.lastName.message}</p>
+            )}
           </Stack>
 
           <Menu.Root>
@@ -128,7 +179,11 @@ const BuildForm = ({ setPreview }) => {
               <Menu.Positioner>
                 <Menu.Content>
                   {Object.entries(TYPE_LABELS).map(([value, label]) => (
-                    <Menu.Item key={value} onClick={() => handleMenuSelect(value)}>
+                    <Menu.Item
+                      key={value}
+                      onClick={() => handleMenuSelect(value)}
+                      _hover={{ bg: "gray.100" }}
+                    >
                       {label}
                     </Menu.Item>
                   ))}
@@ -142,32 +197,58 @@ const BuildForm = ({ setPreview }) => {
           {selectedType === "new-question-text" && (
             <Stack className="field">
               <Label>Question text</Label>
-              <Input {...register("questionText", { required: "Question text is required" })} />
-              {errors.questionText && <p style={{ color: "red" }}>{errors.questionText.message}</p>}
+              <Input
+                {...register("questionText", {
+                  required: "Question text is required",
+                })}
+              />
+              {errors.questionText && (
+                <p style={{ color: "red" }}>{errors.questionText.message}</p>
+              )}
             </Stack>
           )}
 
           {selectedType === "new-text" && (
             <Stack className="field">
               <Label>Text Response</Label>
-              <Input {...register("textResponse", { required: "Response is required" })} />
-              {errors.textResponse && <p style={{ color: "red" }}>{errors.textResponse.message}</p>}
+              <Input
+                {...register("textResponse", {
+                  required: "Response is required",
+                })}
+              />
+              {errors.textResponse && (
+                <p style={{ color: "red" }}>{errors.textResponse.message}</p>
+              )}
             </Stack>
           )}
 
           {selectedType === "new-choice" && (
             <Stack className="field">
               <Label>Choice Options (comma separated)</Label>
-              <Input {...register("choiceOptions", { required: "Choices are required" })} />
-              {errors.choiceOptions && <p style={{ color: "red" }}>{errors.choiceOptions.message}</p>}
+              <Input
+                {...register("choiceOptions", {
+                  required: "Choices are required",
+                })}
+              />
+              {errors.choiceOptions && (
+                <p style={{ color: "red" }}>{errors.choiceOptions.message}</p>
+              )}
             </Stack>
           )}
 
           {selectedType === "new-multiselect" && (
             <Stack className="field">
               <Label>Multi-Select Options (comma separated)</Label>
-              <Input {...register("multiSelectOptions", { required: "Options are required" })} />
-              {errors.multiSelectOptions && <p style={{ color: "red" }}>{errors.multiSelectOptions.message}</p>}
+              <Input
+                {...register("multiSelectOptions", {
+                  required: "Options are required",
+                })}
+              />
+              {errors.multiSelectOptions && (
+                <p style={{ color: "red" }}>
+                  {errors.multiSelectOptions.message}
+                </p>
+              )}
             </Stack>
           )}
         </GridItem>
