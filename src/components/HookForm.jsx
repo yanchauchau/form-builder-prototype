@@ -40,7 +40,7 @@ const BuildForm = ({ setPreview }) => {
   const choiceOptions = watch("choiceOptions", "");
   const selectedChoice = watch("selectedChoice", "");
   const multiSelectOptions = watch("multiSelectOptions", "");
-  const selectedMulti = watch("selectedMulti", []);
+  const selectedMulti = watch("selectedMulti", "");
   const handleMenuSelect = (value) => {
     setValue("selection", value);
   };
@@ -128,13 +128,14 @@ const BuildForm = ({ setPreview }) => {
       setPreview(
    <Stack p={4} border="1px solid #ccc" bg="white" borderRadius="md">
           <Text fontWeight="bold">Multi-Select Options:</Text>
-          <CheckboxGroup value={selectedMulti}>
+          <Stack value={selectedMulti}>
             {optionsArray.map((opt, index) => (
-              <Checkbox key={index} value={opt}>
+                <Checkbox.HiddenInput />
+                <Checkbox.Control />
                 {opt}
-              </Checkbox>
+              </Checkbox.Root>
             ))}
-          </CheckboxGroup>
+          </Stack>
           {selectedMulti.length > 0 && (
             <Text fontWeight="bold">Selected: {selectedMulti.join(", ")}</Text>
           )}
