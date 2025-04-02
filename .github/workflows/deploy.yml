@@ -3,7 +3,10 @@ name: Deploy Vite Site to GitHub Pages
 on:
   push:
     branches:
-      - main  # Triggers deployment when `main` is updated
+      - main  # Deploys when pushing to main
+
+permissions:
+  contents: write  # 🔥 Required to push to gh-pages
 
 jobs:
   deploy:
@@ -12,13 +15,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install and Build
+      - name: Install dependencies and build
         run: |
-          npm install  # Or use pnpm/yarn if needed
+          npm install  # Or yarn/pnpm if you use that
           npm run build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages  # Deploy to `gh-pages`
-          folder: dist  # Vite outputs to `dist` by default
+          branch: gh-pages  # ✅ Make sure this branch exists
+          folder: dist  # ✅ This is where Vite outputs the built files
