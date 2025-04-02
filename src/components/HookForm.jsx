@@ -130,6 +130,7 @@ const BuildForm = ({ setPreview }) => {
           <Text fontWeight="bold">Multi-Select Options:</Text>
           <Stack value={selectedMulti}>
             {optionsArray.map((opt, index) => (
+              <Checkbox.Root key={index} value={opt}>
                 <Checkbox.HiddenInput />
                 <Checkbox.Control />
                 {opt}
