@@ -7,6 +7,8 @@ import {
   Menu,
   Heading,
   Fieldset,
+  IconButton,
+  Textarea,
   Field,
   Portal,
   Grid,
@@ -15,8 +17,10 @@ import {
   Checkbox,
   RadioGroup,
 } from "@chakra-ui/react";
-import { RiExpandUpDownLine } from "react-icons/ri";
+import { RiExpandUpDownLine, RiDeleteBin6Line } from "react-icons/ri";
 import { useForm, useFieldArray } from "react-hook-form";
+import { Tooltip } from "@/components/ui/tooltip";
+import JSONExportButton from "./JSONExportButton";
 
 const TYPE_LABELS = {
   "new-question-text": "Question",
@@ -30,6 +34,7 @@ const BuildForm = ({ setPreview }) => {
     register,
     control,
     setValue,
+    getValues,
     watch,
     handleSubmit,
     formState: { errors },
@@ -39,25 +44,46 @@ const BuildForm = ({ setPreview }) => {
         {
           id: Date.now(),
           type: "new-question-text",
-          order: "",
-          questionText: "",
+          order: "1",
+          questionText: "What is your favorite color?",
         },
       ],
     },
   });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "questions",
   });
 
   // Watch the entire questions array to reactively handle changes
   const questions = watch("questions");
+  const handleOrderChange = (index, value) => {
+    const newOrder = parseInt(value, 10);
+    const totalQuestions = fields.length;
+
+    // Ensure the order is within the valid range
+    if (!isNaN(newOrder) && newOrder > 0 && newOrder <= totalQuestions) {
+      const updatedQuestions = [...fields];
+      const [removed] = updatedQuestions.splice(index, 1); // Remove current question
+      updatedQuestions.splice(newOrder - 1, 0, removed); // Insert at the new position
+
+      // Update order of each question
+      updatedQuestions.forEach((question, idx) => {
+        setValue(`questions.${idx}.order`, idx + 1); // Re-assign order
+      });
+    } else {
+      // Reset to original order if the value is invalid
+      setValue(`questions.${index}.order`, fields[index].order);
+    }
+  };
 
   const generatePreview = (questions) => {
-    return questions.map((field, index) => {
+    const sortedQuestions = [...questions].sort((a, b) => a.order - b.order); // Sort by order
+    return sortedQuestions.map((field, index) => {
       const selectedType = field.type;
       const questionText = field.questionText || "";
+      const questionTextforChoice = field.questionTextforChoice || "";
       const textResponse = field.textResponse || "";
       const choiceOptions = field.choiceOptions || "";
       const selectedChoice = field.selectedChoice || "";
@@ -83,7 +109,7 @@ const BuildForm = ({ setPreview }) => {
             <Text textStyle="2xs" color="GrayText">
               Text
             </Text>
-            <Text>{textResponse}</Text>
+            <Text> {textResponse}</Text>
           </Stack>
         );
       }
@@ -92,21 +118,28 @@ const BuildForm = ({ setPreview }) => {
         const optionsArray = choiceOptions
           .split(",")
           .map((opt) => opt.trim())
-          .filter(Boolean); // removes empty strings
+          .filter(Boolean);
+
+        const questionTextforChoice = field.questionTextforChoice || "";
 
         return (
           <Stack key={field.id} p={4} bg="white" borderRadius="md">
-            <Text fontWeight="bold">Choice Options:</Text>
+            {questionTextforChoice && (
+              <Text size="s" mb={2}>
+                {questionTextforChoice}
+              </Text>
+            )}
+
             <RadioGroup.Root
               value={selectedChoice}
               onChange={(val) => {
-                const cleanValue = val.split("-")[0]; // remove "-0", "-1", etc
+                const cleanValue = val.split("-")[0];
                 setValue(`questions.${index}.selectedChoice`, cleanValue);
               }}
             >
               <Stack direction="column" spacing={4}>
                 {optionsArray.map((opt, i) => {
-                  const value = `${opt}-${i}`; // unique value
+                  const value = `${opt}-${i}`;
                   return (
                     <RadioGroup.Item key={value} value={value}>
                       <RadioGroup.ItemHiddenInput />
@@ -115,7 +148,6 @@ const BuildForm = ({ setPreview }) => {
                     </RadioGroup.Item>
                   );
                 })}
-                
               </Stack>
             </RadioGroup.Root>
             {selectedChoice && (
@@ -210,10 +242,21 @@ const BuildForm = ({ setPreview }) => {
               className="question-element"
             >
               {/* Order Input */}
-              <GridItem rowSpan={2} colSpan={1} p="s" bg="gray.50">
-                <Field.Root>
-                  <Field.Label>Order</Field.Label>
+              <GridItem
+                rowSpan={2}
+                colSpan={1}
+                p="s"
+                bg="gray.50"
+                borderRadius="md"
+                display="flex"
+                flexDir="column"
+                alignItems="start"
+                justifyContent="space-between"
+              >
+                <Field.Root className="order">
+                  {/* <Field.Label fontSize="2xs">Order</Field.Label> */}
                   <Input
+                    bg="white"
                     {...register(`questions.${index}.order`, {
                       required: "Order is required",
                     })}
@@ -224,10 +267,35 @@ const BuildForm = ({ setPreview }) => {
                     </p>
                   )}
                 </Field.Root>
+                <Tooltip
+                  content={
+                    fields.length === 1 || index === 0
+                      ? "You must have at least 1 field or text"
+                      : "Remove question"
+                  }
+                >
+                  <IconButton
+                    aria-label="Remove question"
+                    colorPalette="red"
+                    size="sm"
+                    variant="ghost"
+                    disabled={index === 0 || fields.length === 1}
+                    onClick={() => remove(index)}
+                  >
+                    <RiDeleteBin6Line />
+                  </IconButton>
+                </Tooltip>
               </GridItem>
 
               {/* Type Selector */}
-              <GridItem colSpan={4} p="s" display="flex" gap="sm">
+              <GridItem
+                colSpan={4}
+                p="s"
+                display="flex"
+                gap="s"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Menu.Root>
                   <Menu.Trigger asChild>
                     <Button colorPalette="blue" size="md" variant="outline">
@@ -255,11 +323,11 @@ const BuildForm = ({ setPreview }) => {
               </GridItem>
 
               {/* Input Fields Based on Type */}
-              <GridItem colSpan={4} p="s">
+              <GridItem colSpan={4} px="s" py="s">
                 {selectedType === "new-question-text" && (
                   <Field.Root>
                     <Field.Label>Question text</Field.Label>
-                    <Input
+                    <Textarea
                       {...register(`questions.${index}.questionText`, {
                         required: "Required",
                       })}
@@ -292,10 +360,13 @@ const BuildForm = ({ setPreview }) => {
                   <Fieldset.Root>
                     <Field.Root>
                       <Field.Label>Question text</Field.Label>
-                      <Input
-                        {...register("questionTextforChoice", {
-                          required: "Question text is required",
-                        })}
+                      <Textarea
+                        {...register(
+                          `questions.${index}.questionTextforChoice`,
+                          {
+                            required: "Question text is required",
+                          }
+                        )}
                       />
                       {errors.questionTextforChoice && (
                         <p style={{ color: "red" }}>
@@ -345,8 +416,8 @@ const BuildForm = ({ setPreview }) => {
             append({
               id: Date.now(),
               type: "new-question-text",
-              order: "",
-              questionText: "",
+              order: fields.length + 1, // Set the order to the next number in the sequence
+               questionText: "What is your favorite color?",
             })
           }
           colorPalette="blue"
@@ -356,12 +427,27 @@ const BuildForm = ({ setPreview }) => {
         </Button>
       </Box>
       {/* Preview Section */}
-      <Box w="100%" p="l" spaceY="2" background="blue.50" id="preview">
+      <Box w="100%" p="l" spaceY="2" id="preview">
         <Stack>
-          <Text>Preview</Text>
-          {generatePreview(questions)}
+          <Box display="flex" flexDir="row" justifyContent="space-between" alignItems="center">
+
+            <Text>Preview</Text> <JSONExportButton getValues={getValues} />
+          </Box>
+
+          <Box
+            w="100%"
+            p="xs"
+            spaceY="2"
+            background="blue.50"
+            borderWidth="1px"
+          >
+            {generatePreview(questions)}
+          </Box>
         </Stack>
       </Box>
+      {/* <Box w="100%" p="l" spaceY="2" id="JSON">
+
+      </Box> */}
     </Box>
   );
 };
