@@ -22,7 +22,7 @@ const JSONExportButton = ({ getValues }) => {
   };
 
   return (
-    <Button onClick={downloadJSON} variant="outline" colorPalette="blue" size="xs">
+    <Button onClick={downloadJSON} variant="outline" colorPalette="blue" size="sm">
      <RiDownload2Line/> Download
     </Button>
   );
