@@ -3,7 +3,7 @@ import "./App.css";
 import BuildForm from "./components/HookForm";
 import { generatePreview } from "./components/previewUtils";
 import JSONEditor from "@/components/JSONEditor";
-import { useFormConfig } from "@/lib/context/FormConfigContext";
+import { useFormConfig } from "./lib/context/FormConfigContext"; 
 import { Box, Link, Heading, Tabs, Text } from "@chakra-ui/react";
 import { useColorMode, ColorModeButton } from "@/components/ui/color-mode";
 import { RiInsertRowBottom } from "react-icons/ri";

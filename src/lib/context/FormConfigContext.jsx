@@ -2,8 +2,6 @@ import React, { createContext, useState, useContext } from "react";
 
 const FormConfigContext = createContext();
 
-export const useFormConfig = () => useContext(FormConfigContext);
-
 export const FormConfigProvider = ({ children }) => {
   const [formConfig, setFormConfig] = useState({
     fields: [
@@ -25,7 +23,6 @@ export const FormConfigProvider = ({ children }) => {
     </FormConfigContext.Provider>
   );
 };
-
 
 export function useFormConfig() {
   const context = useContext(FormConfigContext);

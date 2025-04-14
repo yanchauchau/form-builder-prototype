@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Box,
@@ -16,7 +16,6 @@ import { RiExpandUpDownLine, RiDeleteBin6Line } from "react-icons/ri";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Tooltip } from "@/components/ui/tooltip";
 
-
 const TYPE_LABELS = {
   "new-question-text": "Question",
   "new-text": "Text",
@@ -29,8 +28,6 @@ const BuildForm = ({ setQuestions }) => {
     register,
     control,
     setValue,
-    watch,
-
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -52,37 +49,55 @@ const BuildForm = ({ setQuestions }) => {
     name: "questions",
   });
 
-  // Watch the entire questions array to reactively handle changes
-  const questions = watch("questions");
+  // Initialize localQuestions as an empty array
+  const [localQuestions, setLocalQuestions] = useState([]);
 
+  // Effect to sync local state with form state
+  useEffect(() => {
+    setLocalQuestions(fields);
+  }, [fields]);
+
+  // Handle input changes and update both form state and parent state
   const handleInputChange = (index, fieldName, value) => {
-    // 1. Update react-hook-form state
-    setValue(`questions.${index}.${fieldName}`, value);
+    setValue(`questions.${index}.${fieldName}`, value); // Update react-hook-form state
 
-    // 2. Update parent state with a new array
-    const updatedQuestions = questions.map((question, i) => {
-      if (i === index) {
-        return { ...question, [fieldName]: value };
-      }
-      return question;
-    });
-    setQuestions(updatedQuestions);
+    // Update local state
+    const updatedQuestions = [...localQuestions];
+    updatedQuestions[index] = {
+      ...updatedQuestions[index],
+      [fieldName]: value,
+    };
+    setLocalQuestions(updatedQuestions);
+
+    // Update parent state if there's a real change
+    if (JSON.stringify(updatedQuestions) !== JSON.stringify(localQuestions)) {
+      setQuestions(updatedQuestions);
+    }
   };
 
-  useEffect(() => {
-    if (questions.length > 0 && setQuestions) {
-      setQuestions(questions);
-    }
-  }, [questions, setQuestions]);
+  // Handle adding a new question
+  const handleAddQuestion = () => {
+    const newQuestion = {
+      id: Date.now(),
+      type: "new-question-text",
+      order: fields.length + 1,
+      questionText: "What is your favorite color?",
+      textResponse: "",
+      questionOptions: "",
+    };
+    append(newQuestion); // Add new question to form state
+  };
+
+  // Handle removing a question
+  const handleRemoveQuestion = (index) => {
+    remove(index);
+  };
 
   return (
-    <Box w="100%" h="100%" display="flex" flexDir="column" id="test" gap="l">
-      <Box w="100%" h="100%" display="flex" flexDir="column" gap="m" id="form">
+    <Box w="100%" h="100%" display="flex" flexDir="column" gap="l">
+      <Box w="100%" h="100%" display="flex" flexDir="column" gap="m">
         {fields.map((field, index) => {
-          const selectedType = watch(
-            `questions.${index}.type`,
-            "new-question-text"
-          );
+          const selectedType = localQuestions[index]?.type || "new-question-text";
 
           return (
             <Grid
@@ -94,7 +109,6 @@ const BuildForm = ({ setQuestions }) => {
               gridAutoRows="auto"
               borderWidth="1px"
               borderRadius="md"
-              className="question-element"
             >
               {/* Order Input */}
               <GridItem
@@ -111,7 +125,7 @@ const BuildForm = ({ setQuestions }) => {
                 <Field.Root className="order">
                   <Input
                     bg="white"
-                    {...register(`questions.${index}.order`, {})}
+                    {...register(`questions.${index}.order`)}
                   />
                   {errors.questions?.[index]?.order && (
                     <p style={{ color: "red" }}>
@@ -132,7 +146,7 @@ const BuildForm = ({ setQuestions }) => {
                     size="sm"
                     variant="ghost"
                     disabled={index === 0 || fields.length === 1}
-                    onClick={() => remove(index)}
+                    onClick={() => handleRemoveQuestion(index)}
                   >
                     <RiDeleteBin6Line />
                   </IconButton>
@@ -161,7 +175,7 @@ const BuildForm = ({ setQuestions }) => {
                           <Menu.Item
                             key={value}
                             onClick={() =>
-                              setValue(`questions.${index}.type`, value)
+                              handleInputChange(index, "type", value)
                             }
                             _hover={{ bg: "gray.100" }}
                           >
@@ -180,7 +194,7 @@ const BuildForm = ({ setQuestions }) => {
                   <Field.Root>
                     <Field.Label>Question text</Field.Label>
                     <Textarea
-                      value={watch(`questions.${index}.questionText`)}
+                      value={localQuestions[index]?.questionText || ""}
                       onChange={(e) =>
                         handleInputChange(index, "questionText", e.target.value)
                       }
@@ -192,7 +206,7 @@ const BuildForm = ({ setQuestions }) => {
                   <Field.Root>
                     <Field.Label>Text</Field.Label>
                     <Input
-                      value={watch(`questions.${index}.textResponse`)}
+                      value={localQuestions[index]?.textResponse || ""}
                       onChange={(e) =>
                         handleInputChange(index, "textResponse", e.target.value)
                       }
@@ -205,13 +219,9 @@ const BuildForm = ({ setQuestions }) => {
                     <Field.Root>
                       <Field.Label>Question text</Field.Label>
                       <Textarea
-                        value={watch(`questions.${index}.questionText`)}
+                        value={localQuestions[index]?.questionText || ""}
                         onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            "questionText",
-                            e.target.value
-                          )
+                          handleInputChange(index, "questionText", e.target.value)
                         }
                       />
                     </Field.Root>
@@ -219,13 +229,9 @@ const BuildForm = ({ setQuestions }) => {
                     <Field.Root>
                       <Field.Label>Choice Options</Field.Label>
                       <Input
-                        value={watch(`questions.${index}.questionOptions`)}
+                        value={localQuestions[index]?.questionOptions || ""}
                         onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            "questionOptions",
-                            e.target.value
-                          )
+                          handleInputChange(index, "questionOptions", e.target.value)
                         }
                       />
                     </Field.Root>
@@ -237,13 +243,9 @@ const BuildForm = ({ setQuestions }) => {
                     <Field.Root>
                       <Field.Label>Question text</Field.Label>
                       <Textarea
-                        value={watch(`questions.${index}.questionText`)}
+                        value={localQuestions[index]?.questionText || ""}
                         onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            "questionText",
-                            e.target.value
-                          )
+                          handleInputChange(index, "questionText", e.target.value)
                         }
                       />
                     </Field.Root>
@@ -251,13 +253,9 @@ const BuildForm = ({ setQuestions }) => {
                     <Field.Root>
                       <Field.Label>Multi-Select</Field.Label>
                       <Input
-                        value={watch(`questions.${index}.questionOptions`)}
+                        value={localQuestions[index]?.questionOptions || ""}
                         onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            "questionOptions",
-                            e.target.value
-                          )
+                          handleInputChange(index, "questionOptions", e.target.value)
                         }
                       />
                     </Field.Root>
@@ -269,14 +267,7 @@ const BuildForm = ({ setQuestions }) => {
         })}
 
         <Button
-          onClick={() =>
-            append({
-              id: Date.now(),
-              type: "new-question-text",
-              order: fields.length + 1, // Set the order to the next number in the sequence
-              questionText: "What is your favorite color?",
-            })
-          }
+          onClick={handleAddQuestion}
           colorPalette="blue"
           size="md"
         >
