@@ -2,29 +2,30 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import BuildForm from "./components/HookForm";
 import { generatePreview } from "./components/previewUtils";
+import JSONEditor from "@/components/JSONEditor";
+import { useFormConfig } from "@/lib/context/FormConfigContext";
 import { Box, Link, Heading, Tabs, Text } from "@chakra-ui/react";
 import { useColorMode, ColorModeButton } from "@/components/ui/color-mode";
 import { RiInsertRowBottom } from "react-icons/ri";
 import { BiCodeCurly } from "react-icons/bi";
-import JSONEditor from "@/components/JSONEditor";
-import { FormConfigProvider } from "./lib/context/FormConfigContext";
+
+
 
 function App() {
-  const [questions, setQuestions] = useState([]);
+  const { formConfig, setFormConfig } = useFormConfig();
   const [preview, setPreview] = useState([]);
   const { toggleColorMode } = useColorMode();
 
   useEffect(() => {
-    if (questions.length > 0) {
-      const updatedPreview = generatePreview(questions); // no setValue needed here
+    if (formConfig.fields.length > 0) {
+      const updatedPreview = generatePreview(formConfig.fields);
       setPreview(updatedPreview);
-      console.log("Questions updated:", questions);
     }
-  }, [questions]);
+  }, [formConfig.fields]);
 
   return (
     <>
-      <FormConfigProvider>
+   
       <Box display="flex" flexDir="column">
         <Box id="header" display="flex" py="l" px="m" w="100%" flexDir="row">
           <Box w="100%" display="flex" flexDir="column">
@@ -60,11 +61,18 @@ function App() {
                 <Tabs.Indicator rounded="l2" />
               </Tabs.List>
               <Tabs.Content value="ui-builder">
-                <BuildForm questions={questions} setQuestions={setQuestions} />
+              <BuildForm
+  questions={formConfig.fields}
+  setQuestions={(updatedFields) => {
+    setFormConfig({ ...formConfig, fields: updatedFields });
+  }}
+/>
+                    {/* <BuildForm formConfig={formConfig} onChange={setFormConfig} /> */}
               </Tabs.Content>
               <Tabs.Content value="json-builder">
-                {" "}
-                <JSONEditor />
+                {/* <JSONEditor formConfig={formConfig} onChange={setFormConfig} /> */}
+                
+                <JSONEditor  />
               </Tabs.Content>
             </Tabs.Root>
           </Box>
@@ -83,12 +91,15 @@ function App() {
 
             {preview.length > 0
               ? preview.map((item, i) => <Box key={i}>{item}</Box>)
-              : "No preview"}
+              : "No preview"} 
+
+
           </Box>
         </Box>
       </Box>
     </>
+
   );
-  </FormConfigProvider>}
+ }
 
 export default App;
