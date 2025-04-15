@@ -7,11 +7,11 @@ export const FormConfigProvider = ({ children }) => {
     fields: [
       {
         id: "question-1",
-        type: "text",
-        label: "What is your favorite color?",
+        type: "new-question-text",
+        questionText: "What is your favorite color?",
         order: 1,
-        value: "",
-        options: ["Dog", "Cat", "Bird"],
+        textResponse: "What is your favorite color?",
+        questionOptions: ["Dog", "Cat", "Bird"],
         required: true,
       },
     ],
@@ -31,3 +31,15 @@ export function useFormConfig() {
   }
   return context;
 }
+
+
+export const getNewQuestionTemplate = (order) => ({
+  id: Date.now(),
+  type: "new-question-text",
+        questionText: "What is your favorite color?",
+        order,
+        textResponse: "What is your favorite color?",
+        questionOptions: ["Dog", "Cat", "Bird"],
+        required: true,    
+});
+

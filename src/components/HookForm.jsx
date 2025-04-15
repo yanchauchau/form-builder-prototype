@@ -15,6 +15,7 @@ import {
 import { RiExpandUpDownLine, RiDeleteBin6Line } from "react-icons/ri";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Tooltip } from "@/components/ui/tooltip";
+import { getNewQuestionTemplate } from "@/lib/context/FormConfigContext";
 
 const TYPE_LABELS = {
   "new-question-text": "Question",
@@ -23,7 +24,7 @@ const TYPE_LABELS = {
   "new-multiselect": "Multi-Select",
 };
 
-const BuildForm = ({ setQuestions }) => {
+const BuildForm = ({ questions, setQuestions }) => {
   const {
     register,
     control,
@@ -31,16 +32,7 @@ const BuildForm = ({ setQuestions }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      questions: [
-        {
-          id: Date.now(),
-          type: "new-question-text",
-          order: "1",
-          questionText: "What is your favorite color?",
-          textResponse: "Your favorite color is yellow.",
-          questionOptions: "1,2,3",
-        },
-      ],
+      questions, // <- use passed-in config
     },
   });
 
@@ -49,13 +41,15 @@ const BuildForm = ({ setQuestions }) => {
     name: "questions",
   });
 
-  // Initialize localQuestions as an empty array
-  const [localQuestions, setLocalQuestions] = useState([]);
 
-  // Effect to sync local state with form state
+  // Initialize localQuestions with fields directly
+  const [localQuestions, setLocalQuestions] = useState(fields);
+
+  // Effect to sync local state with form state (for subsequent updates)
   useEffect(() => {
     setLocalQuestions(fields);
   }, [fields]);
+
 
   // Handle input changes and update both form state and parent state
   const handleInputChange = (index, fieldName, value) => {
@@ -77,15 +71,8 @@ const BuildForm = ({ setQuestions }) => {
 
   // Handle adding a new question
   const handleAddQuestion = () => {
-    const newQuestion = {
-      id: Date.now(),
-      type: "new-question-text",
-      order: fields.length + 1,
-      questionText: "What is your favorite color?",
-      textResponse: "",
-      questionOptions: "",
-    };
-    append(newQuestion); // Add new question to form state
+    const newQuestion = getNewQuestionTemplate(fields.length + 1);
+    append(newQuestion);
   };
 
   // Handle removing a question

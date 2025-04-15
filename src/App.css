@@ -2,18 +2,29 @@
   max-width: 1280px;
   margin: 0 auto;
   text-align: start;
-  height:100vh;
-  width:100vw;
+  height: 100vh;
+  width: 100vw;
 }
 
 .question-object {
   width: 100%;
   height: 100%;
 
+
+}
+/* 
+.preview-object {
+  display: flex;
+  flex-direction: row;
+  background-color: white;
+border: 1px rgb(230, 230, 230) solid;
+border-radius: 8px;
 }
 
-
-
+.preview-object-details {
+  display: flex;
+  flex-direction: row;
+} */
 
 .card {
   padding: 2em;
