@@ -48,13 +48,15 @@ const BuildForm = ({ questions, setQuestions }) => {
   // Effect to sync local state with form state (for subsequent updates)
   useEffect(() => {
     setLocalQuestions(fields);
-  }, [fields]);
+  }, [fields,]);
+
+  
 
 
   // Handle input changes and update both form state and parent state
   const handleInputChange = (index, fieldName, value) => {
     setValue(`questions.${index}.${fieldName}`, value); // Update react-hook-form state
-
+  
     // Update local state
     const updatedQuestions = [...localQuestions];
     updatedQuestions[index] = {
@@ -62,12 +64,11 @@ const BuildForm = ({ questions, setQuestions }) => {
       [fieldName]: value,
     };
     setLocalQuestions(updatedQuestions);
-
+  
     // Update parent state if there's a real change
-    if (JSON.stringify(updatedQuestions) !== JSON.stringify(localQuestions)) {
-      setQuestions(updatedQuestions);
-    }
+    setQuestions(updatedQuestions); // Directly update parent state (form config)
   };
+  
 
   // Handle adding a new question
   const handleAddQuestion = () => {

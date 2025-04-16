@@ -82,7 +82,15 @@ useEffect(() => {
 
               </Tabs.Content>
               <Tabs.Content value="json-builder">
-                <JSONEditor />
+              <JSONEditor
+    value={localQuestions} // Pass localQuestions as value
+    onChange={(newQuestions) => {
+      setLocalQuestions(newQuestions);
+      setFormConfig({ ...formConfig, fields: newQuestions }); // Sync with formConfig
+    }}
+  />
+
+
               </Tabs.Content>
             </Tabs.Root>
           </Box>
